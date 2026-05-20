@@ -12,7 +12,7 @@ It creates:
 - `.agent/context.json`
 - `.agent/checklist.md`
 
-## Why this exists
+## 🔍 Why This Exists
 
 Claude Code, Codex, OpenClaw, Cursor, and other coding agents work better when the repository explains itself. Most repos do not have a clear agent guide, so agents waste time guessing:
 
@@ -24,7 +24,7 @@ Claude Code, Codex, OpenClaw, Cursor, and other coding agents work better when t
 
 Agent Ready turns that repo knowledge into small, reviewable files.
 
-## Install
+## ⚡ Install
 
 ```bash
 python3 -m pip install agent-ready
@@ -36,7 +36,7 @@ For local development:
 python3 -m pip install -e .
 ```
 
-## Quick Start
+## 🚀 Quick Start
 
 Preview a repo summary:
 
@@ -56,7 +56,7 @@ Overwrite existing generated files:
 agent-ready . --write --force
 ```
 
-## What It Detects
+## 🧠 What It Detects
 
 - languages
 - frameworks
@@ -69,7 +69,7 @@ agent-ready . --write --force
 - risky areas such as auth, payments, env files, deployments, and migrations
 - top-level directories that matter to agents
 
-## Example Output
+## 📦 Generated Deliverables
 
 ```text
 AGENTS.md
@@ -89,7 +89,7 @@ CODEX.md
 
 `.agent/checklist.md` is a lightweight QA checklist before PRs or final answers.
 
-## Q&A Quality Gate
+## 🧪 Quality Gate
 
 Before publishing this repo, Agent Ready was checked against these questions:
 
@@ -99,7 +99,7 @@ Before publishing this repo, Agent Ready was checked against these questions:
 - Can a user run it in five minutes? Yes: install, run `agent-ready . --write`, review generated files.
 - What can go wrong? Detection is heuristic. Users should review output before committing.
 
-## Security Notes
+## 🛡️ Security Notes
 
 Agent Ready does not send repository content anywhere. It scans local file names and small config files only.
 
@@ -110,7 +110,7 @@ Recommended use:
 - treat generated risk areas as prompts for human review, not absolute truth,
 - run inside a trusted local checkout.
 
-## Roadmap
+## 🗺️ Roadmap
 
 - OpenClaw profile
 - MCP server from `.agent/context.json`
@@ -120,13 +120,13 @@ Recommended use:
 - config file for custom rules
 - GitHub Action that checks whether a repo is agent-ready
 
-## Support
+## 💛 Support
 
 If this helps your agents make fewer mistakes, support is optional and appreciated:
 
 - EVM: `0x1ecab01075f3bdf1b56b7d849c8e28ef88943624`
 - PayPal: `ckelvinkhanh32@gmail.com`
 
-## License
+## 📄 License
 
 MIT
