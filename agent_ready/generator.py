@@ -6,15 +6,28 @@ from pathlib import Path
 from .scanner import ProjectSummary
 
 
-def write_outputs(root: Path, summary: ProjectSummary, force: bool = False) -> list[Path]:
+def render_outputs(root: Path, summary: ProjectSummary) -> dict[Path, str]:
     agent_dir = root / ".agent"
-    outputs = {
+    return {
         root / "AGENTS.md": agents_md(summary),
         root / "CLAUDE.md": claude_md(summary),
         root / "CODEX.md": codex_md(summary),
         agent_dir / "context.json": json.dumps(summary.to_dict(), indent=2) + "\n",
         agent_dir / "checklist.md": checklist_md(summary),
     }
+
+
+def stale_outputs(root: Path, summary: ProjectSummary) -> list[Path]:
+    stale: list[Path] = []
+    for path, content in render_outputs(root, summary).items():
+        if not path.exists() or path.read_text(encoding="utf-8") != content:
+            stale.append(path)
+    return stale
+
+
+def write_outputs(root: Path, summary: ProjectSummary, force: bool = False) -> list[Path]:
+    agent_dir = root / ".agent"
+    outputs = render_outputs(root, summary)
     written: list[Path] = []
     agent_dir.mkdir(exist_ok=True)
     for path, content in outputs.items():

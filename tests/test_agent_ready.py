@@ -2,7 +2,9 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
+from agent_ready.cli import main
 from agent_ready.generator import write_outputs
 from agent_ready.scanner import scan
 
@@ -40,6 +42,20 @@ class AgentReadyTest(unittest.TestCase):
             self.assertIn(".agent/checklist.md", names)
             context = json.loads((root / ".agent" / "context.json").read_text())
             self.assertEqual(context["name"], root.name)
+
+    def test_check_exits_nonzero_when_outputs_are_missing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            with patch("sys.argv", ["agent-ready", str(root), "--check"]):
+                self.assertEqual(main(), 1)
+
+    def test_check_passes_after_forced_write(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            summary = scan(root)
+            write_outputs(root, summary, force=True)
+            with patch("sys.argv", ["agent-ready", str(root), "--check"]):
+                self.assertEqual(main(), 0)
 
 
 if __name__ == "__main__":

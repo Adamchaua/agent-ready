@@ -35,8 +35,5 @@ not detected
 ## Files To Inspect First
 
 - `.github/workflows/ci.yml`
-- `AGENTS.md`
-- `CLAUDE.md`
-- `CODEX.md`
 - `README.md`
 - `pyproject.toml`

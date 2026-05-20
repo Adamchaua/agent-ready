@@ -56,6 +56,14 @@ Overwrite existing generated files:
 agent-ready . --write --force
 ```
 
+Check whether generated files are missing or stale in CI:
+
+```bash
+agent-ready . --check
+```
+
+`--check` exits with status `1` and lists the files to regenerate when repo context changed.
+
 ## 🧠 What It Detects
 
 - languages
@@ -119,6 +127,7 @@ Recommended use:
 - ownership/team map
 - config file for custom rules
 - GitHub Action that checks whether a repo is agent-ready
+- richer CI snippets for `agent-ready . --check`
 
 ## 💛 Support
 

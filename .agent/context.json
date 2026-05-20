@@ -8,9 +8,6 @@
   "package_managers": [],
   "important_files": [
     ".github/workflows/ci.yml",
-    "AGENTS.md",
-    "CLAUDE.md",
-    "CODEX.md",
     "README.md",
     "pyproject.toml"
   ],

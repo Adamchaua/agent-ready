@@ -19,7 +19,10 @@ IGNORED_DIRS = {
     "__pycache__",
     ".next",
     ".turbo",
+    ".agent",
 }
+
+GENERATED_FILES = {"AGENTS.md", "CLAUDE.md", "CODEX.md"}
 
 IMPORTANT_FILES = [
     "README.md",
@@ -99,6 +102,8 @@ def iter_files(root: Path) -> Iterable[Path]:
     for current, dirs, files in os.walk(root):
         dirs[:] = [d for d in dirs if (d not in IGNORED_DIRS and not d.startswith(".")) or d == ".github"]
         for file in files:
+            if file in GENERATED_FILES:
+                continue
             path = Path(current) / file
             if path.is_file() and path.stat().st_size <= 500_000:
                 yield path
