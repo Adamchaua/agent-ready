@@ -2,6 +2,8 @@
 
 ![Agent Ready hero](docs/hero.png)
 
+![agent-ready demo output](docs/demo-output.svg)
+
 Agent Ready is **CI for AI coding context**. It scans a repository and generates the context files AI coding agents need before they touch code.
 
 > README for agents, kept up to date.
@@ -113,6 +115,32 @@ flowchart LR
 The scanner uses local repository evidence such as package files, CI workflows, source extensions, and risk patterns. Generated outputs stay reviewable, small, and safe to commit.
 
 For deeper product positioning and market research, see [`docs/product-research.md`](docs/product-research.md). The maintainable diagram source is in [`docs/architecture.mmd`](docs/architecture.mmd).
+
+## ✅ GitHub Action
+
+Use this repository as a composite action to block stale agent context in CI:
+
+```yaml
+name: agent-ready
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Adamchaua/agent-ready@v0.1.0
+        with:
+          mode: check
+```
+
+Other modes:
+
+```yaml
+with:
+  mode: score      # print score
+  # mode: json-score
+  # mode: refresh
+```
 
 ## 🧠 What It Detects
 
