@@ -7,6 +7,7 @@ from pathlib import Path
 from . import __version__
 from .generator import stale_outputs, write_outputs
 from .scanner import scan
+from .score import calculate_score
 
 
 def main() -> int:
@@ -30,6 +31,7 @@ def main() -> int:
         help="extra directory path to skip; repeat as needed",
     )
     parser.add_argument("--json", action="store_true", help="print JSON summary")
+    parser.add_argument("--score", action="store_true", help="print agent-readiness score")
     parser.add_argument("--version", action="store_true", help="print version")
     args = parser.parse_args()
 
@@ -57,8 +59,16 @@ def main() -> int:
         if not written:
             print("no files written; use --force to overwrite existing generated files")
 
-    if args.json or (not args.write and not args.check):
-        print(json.dumps(summary.to_dict(), indent=2))
+    if args.json or (not args.write and not args.check and not args.score):
+        payload = summary.to_dict()
+        if args.score:
+            payload["readiness"] = calculate_score(summary).to_dict()
+        print(json.dumps(payload, indent=2))
+    elif args.score:
+        readiness = calculate_score(summary)
+        print(f"agent-readiness: {readiness.score}/100 ({readiness.grade})")
+        for recommendation in readiness.recommendations:
+            print(f"- {recommendation}")
 
     return 0
 

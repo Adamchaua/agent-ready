@@ -7,6 +7,7 @@ from unittest.mock import patch
 from agent_ready.cli import main
 from agent_ready.generator import write_outputs
 from agent_ready.scanner import scan
+from agent_ready.score import calculate_score
 
 
 class AgentReadyTest(unittest.TestCase):
@@ -77,6 +78,23 @@ class AgentReadyTest(unittest.TestCase):
             self.assertIn(".agent/checklist.md", names)
             context = json.loads((root / ".agent" / "context.json").read_text())
             self.assertEqual(context["name"], root.name)
+
+    def test_readiness_score_grades_repo_signals(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            readiness = calculate_score(scan(root))
+            self.assertGreaterEqual(readiness.score, 75)
+            self.assertIn(readiness.grade, {"A", "B"})
+
+    def test_json_score_includes_readiness_payload(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            with patch("sys.argv", ["agent-ready", str(root), "--json", "--score"]):
+                with patch("builtins.print") as mocked_print:
+                    self.assertEqual(main(), 0)
+            payload = json.loads(mocked_print.call_args.args[0])
+            self.assertIn("readiness", payload)
+            self.assertIn("score", payload["readiness"])
 
     def test_check_exits_nonzero_when_outputs_are_missing(self):
         with tempfile.TemporaryDirectory() as directory:

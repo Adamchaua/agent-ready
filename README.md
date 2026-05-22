@@ -68,6 +68,13 @@ Check whether generated files are missing or stale in CI:
 agent-ready . --check
 ```
 
+Print an agent-readiness score with recommendations:
+
+```bash
+agent-ready . --score
+agent-ready . --json --score
+```
+
 Skip project-specific generated or vendor directories during a scan:
 
 ```bash
