@@ -8,7 +8,7 @@ Use this as the first context file when working in Claude Code.
 
 - Main languages: `Python`
 - Frameworks: not detected
-- Key directories: `agent_ready.egg-info`, `agent_ready`, `.github`, `assets`, `tests`
+- Key directories: `agent_ready`, `docs`, `.github`, `assets`, `tests`
 - Risk areas: `deployment`
 
 ## Verification Commands
@@ -19,13 +19,16 @@ python -m unittest discover -s tests -v
 ```
 
 Build:
-```text
-not detected
+```bash
+python -m build --sdist --wheel
+```
+```bash
+make
 ```
 
 Lint:
-```text
-not detected
+```bash
+python -m ruff check .
 ```
 
 ## Claude-Specific Rules

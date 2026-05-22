@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass, asdict
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable
 
 IGNORED_DIRS = {
     ".git",
@@ -19,7 +19,11 @@ IGNORED_DIRS = {
     "__pycache__",
     ".next",
     ".turbo",
+    ".agent",
+    "htmlcov",
 }
+
+GENERATED_FILES = {"AGENTS.md", "CLAUDE.md", "CODEX.md"}
 
 IMPORTANT_FILES = [
     "README.md",
@@ -65,15 +69,19 @@ class ProjectSummary:
         return asdict(self)
 
 
-def scan(root: Path) -> ProjectSummary:
+def scan(root: Path, extra_ignores: Iterable[str] | None = None) -> ProjectSummary:
     root = root.resolve()
-    files = list(iter_files(root))
+    files = list(iter_files(root, extra_ignores=extra_ignores))
     names = {p.name for p in files}
     rels = {rel(root, p) for p in files}
     languages = detect_languages(files)
     package_managers = detect_package_managers(names)
     frameworks = detect_frameworks(root, files)
-    important = sorted(path for path in rels if Path(path).name in IMPORTANT_FILES or path.startswith(".github/workflows/"))
+    important = sorted(
+        path
+        for path in rels
+        if Path(path).name in IMPORTANT_FILES or path.startswith(".github/workflows/")
+    )
     tests, builds, lints = detect_commands(root, names)
     workflows = sorted(path for path in rels if path.startswith(".github/workflows/"))
     risks = detect_risks(root, files, rels)
@@ -95,10 +103,23 @@ def scan(root: Path) -> ProjectSummary:
     )
 
 
-def iter_files(root: Path) -> Iterable[Path]:
+def iter_files(root: Path, extra_ignores: Iterable[str] | None = None) -> Iterable[Path]:
+    ignored = IGNORED_DIRS | {item.strip().strip("/") for item in (extra_ignores or []) if item.strip()}
     for current, dirs, files in os.walk(root):
-        dirs[:] = [d for d in dirs if (d not in IGNORED_DIRS and not d.startswith(".")) or d == ".github"]
+        current_path = Path(current)
+        kept_dirs = []
+        for directory in dirs:
+            rel_dir = (current_path / directory).relative_to(root).as_posix()
+            if directory.endswith(".egg-info"):
+                continue
+            is_ignored = directory in ignored or rel_dir in ignored or directory.startswith(".")
+            if is_ignored and directory != ".github":
+                continue
+            kept_dirs.append(directory)
+        dirs[:] = kept_dirs
         for file in files:
+            if file in GENERATED_FILES:
+                continue
             path = Path(current) / file
             if path.is_file() and path.stat().st_size <= 500_000:
                 yield path
@@ -138,6 +159,7 @@ def detect_package_managers(names: set[str]) -> list[str]:
         "npm": "package-lock.json",
         "pnpm": "pnpm-lock.yaml",
         "yarn": "yarn.lock",
+        "Python/pyproject": "pyproject.toml",
         "Python/uv": "uv.lock",
         "Python/pip": "requirements.txt",
         "Python/Poetry": "poetry.lock",
@@ -157,7 +179,14 @@ def detect_frameworks(root: Path, files: list[Path]) -> list[str]:
         try:
             data = json.loads(package.read_text())
             deps = {**data.get("dependencies", {}), **data.get("devDependencies", {})}
-            for key, label in {"next": "Next.js", "react": "React", "vue": "Vue", "svelte": "Svelte", "vite": "Vite"}.items():
+            js_frameworks = {
+                "next": "Next.js",
+                "react": "React",
+                "vue": "Vue",
+                "svelte": "Svelte",
+                "vite": "Vite",
+            }
+            for key, label in js_frameworks.items():
                 if key in deps:
                     found.add(label)
         except Exception:
@@ -165,7 +194,13 @@ def detect_frameworks(root: Path, files: list[Path]) -> list[str]:
     names = {p.name for p in files}
     if "pyproject.toml" in names or "requirements.txt" in names:
         text = safe_read(root / "pyproject.toml") + safe_read(root / "requirements.txt")
-        for key, label in {"fastapi": "FastAPI", "django": "Django", "flask": "Flask", "pytest": "pytest"}.items():
+        python_frameworks = {
+            "fastapi": "FastAPI",
+            "django": "Django",
+            "flask": "Flask",
+            "pytest": "pytest",
+        }
+        for key, label in python_frameworks.items():
             if key in text.lower():
                 found.add(label)
     if "go.mod" in names:
@@ -196,6 +231,11 @@ def detect_commands(root: Path, names: set[str]) -> tuple[list[str], list[str], 
             tests.append("python -m unittest discover -s tests -v")
         else:
             tests.append("python -m pytest")
+        pyproject_text = safe_read(root / "pyproject.toml").lower()
+        if "ruff" in pyproject_text:
+            lints.append("python -m ruff check .")
+        if "build" in pyproject_text or "[build-system]" in pyproject_text:
+            builds.append("python -m build --sdist --wheel")
     if "go.mod" in names:
         tests.append("go test ./...")
         builds.append("go build ./...")

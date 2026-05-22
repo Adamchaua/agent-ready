@@ -1,0 +1,30 @@
+flowchart LR
+    subgraph Repo[Repository]
+      Code[Source code]
+      Config[Package and CI config]
+      Docs[README / existing docs]
+    end
+
+    Scanner[agent-ready scanner]
+    Evidence[Evidence map
+commands, risks, stack]
+    Generator[Context generator]
+
+    subgraph Outputs[Agent onboarding outputs]
+      Agents[AGENTS.md]
+      Claude[CLAUDE.md]
+      Codex[CODEX.md]
+      Manifest[.agent/context.json]
+      Checklist[.agent/checklist.md]
+    end
+
+    subgraph Guardrails[Safety and drift controls]
+      Ignore[Ignore generated/vendor/fixtures]
+      Secrets[Secret and env risk detection]
+      Check[agent-ready --check]
+      CI[CI drift gate]
+    end
+
+    Repo --> Scanner --> Evidence --> Generator --> Outputs
+    Evidence --> Guardrails
+    Outputs --> Check --> CI
