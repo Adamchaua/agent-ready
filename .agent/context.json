@@ -10,14 +10,20 @@
   ],
   "important_files": [
     ".github/workflows/ci.yml",
+    "Makefile",
     "README.md",
     "pyproject.toml"
   ],
   "test_commands": [
     "python -m unittest discover -s tests -v"
   ],
-  "build_commands": [],
-  "lint_commands": [],
+  "build_commands": [
+    "python -m build --sdist --wheel",
+    "make"
+  ],
+  "lint_commands": [
+    "python -m ruff check ."
+  ],
   "ci_workflows": [
     ".github/workflows/ci.yml"
   ],

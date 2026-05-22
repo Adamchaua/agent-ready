@@ -231,6 +231,11 @@ def detect_commands(root: Path, names: set[str]) -> tuple[list[str], list[str], 
             tests.append("python -m unittest discover -s tests -v")
         else:
             tests.append("python -m pytest")
+        pyproject_text = safe_read(root / "pyproject.toml").lower()
+        if "ruff" in pyproject_text:
+            lints.append("python -m ruff check .")
+        if "build" in pyproject_text or "[build-system]" in pyproject_text:
+            builds.append("python -m build --sdist --wheel")
     if "go.mod" in names:
         tests.append("go test ./...")
         builds.append("go build ./...")

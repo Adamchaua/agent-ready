@@ -49,13 +49,15 @@ class AgentReadyTest(unittest.TestCase):
     def test_scan_detects_pyproject_only_python_package(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "pyproject.toml").write_text("[project]\nname = 'demo'\n")
+            pyproject = "[build-system]\nrequires = ['setuptools']\n\n[project]\nname = 'demo'\n"
+            (root / "pyproject.toml").write_text(pyproject)
             (root / "demo").mkdir()
             (root / "demo" / "__init__.py").write_text("")
             summary = scan(root)
             self.assertIn("Python", summary.languages)
             self.assertIn("Python/pyproject", summary.package_managers)
             self.assertIn("python -m pytest", summary.test_commands)
+            self.assertIn("python -m build --sdist --wheel", summary.build_commands)
 
     def test_scan_skips_python_packaging_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -23,17 +23,21 @@ python -m unittest discover -s tests -v
 ```
 
 Build:
-```text
-not detected
+```bash
+python -m build --sdist --wheel
+```
+```bash
+make
 ```
 
 Lint:
-```text
-not detected
+```bash
+python -m ruff check .
 ```
 
 ## Files To Inspect First
 
 - `.github/workflows/ci.yml`
+- `Makefile`
 - `README.md`
 - `pyproject.toml`

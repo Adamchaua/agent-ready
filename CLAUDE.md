@@ -19,13 +19,16 @@ python -m unittest discover -s tests -v
 ```
 
 Build:
-```text
-not detected
+```bash
+python -m build --sdist --wheel
+```
+```bash
+make
 ```
 
 Lint:
-```text
-not detected
+```bash
+python -m ruff check .
 ```
 
 ## Claude-Specific Rules

@@ -38,8 +38,11 @@ For local development:
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e '.[dev]'
-python -m unittest discover -s tests -v
-python -m ruff check .
+make test PYTHON=.venv/bin/python
+make lint PYTHON=.venv/bin/python
+make build PYTHON=.venv/bin/python
+make check AGENT_READY=.venv/bin/agent-ready
+make score AGENT_READY=.venv/bin/agent-ready
 ```
 
 ## 🚀 Quick Start
@@ -82,6 +85,18 @@ agent-ready . --json --ignore fixtures --ignore examples/generated
 ```
 
 `--check` exits with status `1` and lists the files to regenerate when repo context changed.
+
+## 📊 Demo Output
+
+```text
+$ agent-ready . --score
+agent-readiness: 100/100 (A)
+```
+
+```text
+$ agent-ready . --check
+agent-ready files are current
+```
 
 ## 🏗️ Architecture
 
