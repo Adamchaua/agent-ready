@@ -62,6 +62,12 @@ Check whether generated files are missing or stale in CI:
 agent-ready . --check
 ```
 
+Skip project-specific generated or vendor directories during a scan:
+
+```bash
+agent-ready . --json --ignore fixtures --ignore examples/generated
+```
+
 `--check` exits with status `1` and lists the files to regenerate when repo context changed.
 
 ## 🧠 What It Detects

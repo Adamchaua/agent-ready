@@ -68,9 +68,9 @@ class ProjectSummary:
         return asdict(self)
 
 
-def scan(root: Path) -> ProjectSummary:
+def scan(root: Path, extra_ignores: Iterable[str] | None = None) -> ProjectSummary:
     root = root.resolve()
-    files = list(iter_files(root))
+    files = list(iter_files(root, extra_ignores=extra_ignores))
     names = {p.name for p in files}
     rels = {rel(root, p) for p in files}
     languages = detect_languages(files)
@@ -98,9 +98,17 @@ def scan(root: Path) -> ProjectSummary:
     )
 
 
-def iter_files(root: Path) -> Iterable[Path]:
+def iter_files(root: Path, extra_ignores: Iterable[str] | None = None) -> Iterable[Path]:
+    ignored = IGNORED_DIRS | {item.strip().strip("/") for item in (extra_ignores or []) if item.strip()}
     for current, dirs, files in os.walk(root):
-        dirs[:] = [d for d in dirs if (d not in IGNORED_DIRS and not d.startswith(".")) or d == ".github"]
+        current_path = Path(current)
+        kept_dirs = []
+        for directory in dirs:
+            rel_dir = (current_path / directory).relative_to(root).as_posix()
+            if ((directory in ignored or rel_dir in ignored or directory.startswith(".")) and directory != ".github"):
+                continue
+            kept_dirs.append(directory)
+        dirs[:] = kept_dirs
         for file in files:
             if file in GENERATED_FILES:
                 continue

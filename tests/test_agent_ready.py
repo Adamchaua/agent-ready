@@ -29,6 +29,18 @@ class AgentReadyTest(unittest.TestCase):
             self.assertIn("npm run build", summary.build_commands)
             self.assertIn(".github/workflows/ci.yml", summary.ci_workflows)
 
+    def test_scan_respects_extra_ignores(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            (root / "fixtures").mkdir()
+            (root / "fixtures" / "generated.py").write_text("print('skip me')")
+            (root / "examples" / "generated").mkdir(parents=True)
+            (root / "examples" / "generated" / "demo.py").write_text("print('skip me too')")
+            summary = scan(root, extra_ignores=["fixtures", "examples/generated"])
+            self.assertNotIn("Python", summary.languages)
+            self.assertNotIn("fixtures", summary.top_directories)
+            self.assertNotIn("examples", summary.top_directories)
+
     def test_write_outputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = self.make_repo(Path(directory))
