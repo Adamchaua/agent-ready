@@ -12,10 +12,23 @@ from .scanner import scan
 def main() -> int:
     parser = argparse.ArgumentParser(description="Make a repo ready for AI coding agents.")
     parser.add_argument("path", nargs="?", default=".", help="repository path to scan")
-    parser.add_argument("--write", action="store_true", help="write AGENTS.md, CLAUDE.md, CODEX.md and .agent files")
-    parser.add_argument("--check", action="store_true", help="exit non-zero when generated agent files are missing or stale")
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="write AGENTS.md, CLAUDE.md, CODEX.md and .agent files",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="exit non-zero when generated agent files are missing or stale",
+    )
     parser.add_argument("--force", action="store_true", help="overwrite existing generated files")
-    parser.add_argument("--ignore", action="append", default=[], help="extra directory path to skip; repeat as needed")
+    parser.add_argument(
+        "--ignore",
+        action="append",
+        default=[],
+        help="extra directory path to skip; repeat as needed",
+    )
     parser.add_argument("--json", action="store_true", help="print JSON summary")
     parser.add_argument("--version", action="store_true", help="print version")
     args = parser.parse_args()

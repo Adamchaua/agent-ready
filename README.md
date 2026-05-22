@@ -1,8 +1,10 @@
 # Agent Ready
 
-![Agent Ready logo](assets/logo.svg)
+![Agent Ready hero](docs/hero.png)
 
-Agent Ready scans a repository and generates the context files AI coding agents need before they touch code.
+Agent Ready is **CI for AI coding context**. It scans a repository and generates the context files AI coding agents need before they touch code.
+
+> README for agents, kept up to date.
 
 It creates:
 
@@ -33,7 +35,11 @@ python3 -m pip install agent-ready
 For local development:
 
 ```bash
-python3 -m pip install -e .
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e '.[dev]'
+python -m unittest discover -s tests -v
+python -m ruff check .
 ```
 
 ## 🚀 Quick Start
@@ -69,6 +75,22 @@ agent-ready . --json --ignore fixtures --ignore examples/generated
 ```
 
 `--check` exits with status `1` and lists the files to regenerate when repo context changed.
+
+## 🏗️ Architecture
+
+```mermaid
+flowchart LR
+    Repo[Repository] --> Scanner[agent-ready scanner]
+    Scanner --> Evidence[Evidence map: stack, commands, risks]
+    Evidence --> Generator[Context generator]
+    Generator --> Outputs[AGENTS.md / CLAUDE.md / CODEX.md / .agent]
+    Outputs --> Check[agent-ready --check]
+    Check --> CI[CI drift gate]
+```
+
+The scanner uses local repository evidence such as package files, CI workflows, source extensions, and risk patterns. Generated outputs stay reviewable, small, and safe to commit.
+
+For deeper product positioning and market research, see [`docs/product-research.md`](docs/product-research.md). The maintainable diagram source is in [`docs/architecture.mmd`](docs/architecture.mmd).
 
 ## 🧠 What It Detects
 

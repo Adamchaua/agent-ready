@@ -13,7 +13,7 @@ Repository: `agent-ready`
 
 - Languages: `Python`
 - Frameworks: not detected
-- Package managers: not detected
+- Package managers: `Python/pyproject`
 
 ## Commands
 

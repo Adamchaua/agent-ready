@@ -5,7 +5,9 @@
     "Python"
   ],
   "frameworks": [],
-  "package_managers": [],
+  "package_managers": [
+    "Python/pyproject"
+  ],
   "important_files": [
     ".github/workflows/ci.yml",
     "README.md",
@@ -23,8 +25,8 @@
     "deployment"
   ],
   "top_directories": [
-    "agent_ready.egg-info",
     "agent_ready",
+    "docs",
     ".github",
     "assets",
     "tests"

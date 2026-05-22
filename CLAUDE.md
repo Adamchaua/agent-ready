@@ -8,7 +8,7 @@ Use this as the first context file when working in Claude Code.
 
 - Main languages: `Python`
 - Frameworks: not detected
-- Key directories: `agent_ready.egg-info`, `agent_ready`, `.github`, `assets`, `tests`
+- Key directories: `agent_ready`, `docs`, `.github`, `assets`, `tests`
 - Risk areas: `deployment`
 
 ## Verification Commands

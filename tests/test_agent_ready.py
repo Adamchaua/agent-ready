@@ -11,7 +11,11 @@ from agent_ready.scanner import scan
 
 class AgentReadyTest(unittest.TestCase):
     def make_repo(self, root: Path) -> Path:
-        (root / "package.json").write_text(json.dumps({"scripts": {"test": "vitest", "build": "vite build", "lint": "eslint ."}, "dependencies": {"react": "latest", "vite": "latest"}}))
+        package_json = {
+            "scripts": {"test": "vitest", "build": "vite build", "lint": "eslint ."},
+            "dependencies": {"react": "latest", "vite": "latest"},
+        }
+        (root / "package.json").write_text(json.dumps(package_json))
         (root / "src").mkdir()
         (root / "src" / "main.tsx").write_text("console.log('ok')")
         (root / ".github" / "workflows").mkdir(parents=True)
@@ -40,6 +44,25 @@ class AgentReadyTest(unittest.TestCase):
             self.assertNotIn("Python", summary.languages)
             self.assertNotIn("fixtures", summary.top_directories)
             self.assertNotIn("examples", summary.top_directories)
+
+    def test_scan_detects_pyproject_only_python_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "pyproject.toml").write_text("[project]\nname = 'demo'\n")
+            (root / "demo").mkdir()
+            (root / "demo" / "__init__.py").write_text("")
+            summary = scan(root)
+            self.assertIn("Python", summary.languages)
+            self.assertIn("Python/pyproject", summary.package_managers)
+            self.assertIn("python -m pytest", summary.test_commands)
+
+    def test_scan_skips_python_packaging_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = self.make_repo(Path(directory))
+            (root / "agent_ready.egg-info").mkdir()
+            (root / "agent_ready.egg-info" / "PKG-INFO").write_text("Metadata-Version: 2.1")
+            summary = scan(root)
+            self.assertNotIn("agent_ready.egg-info", summary.top_directories)
 
     def test_write_outputs(self):
         with tempfile.TemporaryDirectory() as directory:
